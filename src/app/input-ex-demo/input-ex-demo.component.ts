@@ -55,4 +55,9 @@ export class InputExDemoComponent implements OnInit {
     }
   }
 
+  commit1($event: string) {
+    console.log($event);
+    this.title = $event;
+  }
+
 }

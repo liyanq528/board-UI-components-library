@@ -4,7 +4,7 @@
                 [inputIsRequired]="true"
                 [inputDisabled]="disabled"
                 [inputMaxlength]="3"
-                (commitEvent)="title = $event">
+                (commitEvent)="commit1($event)">
   </lib-input-ex>
   <lib-input-ex [inputLabel]="'testInputNumber'"
                 [inputDefaultValue]="age"

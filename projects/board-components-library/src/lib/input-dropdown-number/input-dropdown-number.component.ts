@@ -104,7 +104,7 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
   validInputFun(control: AbstractControl): ValidationErrors | null {
     const inputNum = Number(control.value);
     const defaultMessage = this.service.isEnglishLang ? 'The number is in used' : '已经使用';
-    return this.inUsedNumbers.findIndex(value => value === inputNum) > -1 ?
+    return this.inUsedNumbers && this.inUsedNumbers.findIndex(value => value === inputNum) > -1 ?
       {inUsed: defaultMessage} : null;
   }
 
@@ -171,7 +171,7 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
 
   commitValue(value: number) {
     if (value >= this.min && value <= this.max && !this.itemDisabled(value) &&
-      this.inUsedNumbers.findIndex(value1 => value1 === value) === -1) {
+      (this.inUsedNumbers ? this.inUsedNumbers.findIndex(value1 => value1 === value) === -1 : true)) {
       this.changeItemSelect(value);
     }
   }

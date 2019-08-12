@@ -1,16 +1,16 @@
 <div style="margin-left: 20px;">
-  <lib-input-dropdown-number [inputDropdownLabel]="'Normal sync demo'"
-                             [dropdownMenuHeader]="'Select age'"
-                             [inputDropdownIsRequired]="true"
-                             [inputDropdownDisabled]="disabled"
-                             [dropdownItemDisabledFn]="dropdownDisabledFn()"
-                             [inputPlaceholder]="'Select age...'"
-                             [inputMin]="20"
-                             [inputMax]="200"
-                             [inputConflictNumbers]="[45,36]"
-                             [dropdownMinWidth]="200"
-                             (dropdownChangeItem)="setActiveItem($event)">
-  </lib-input-dropdown-number>
+  <!--<lib-input-dropdown-number [inputDropdownLabel]="'Normal sync demo'"-->
+                             <!--[dropdownMenuHeader]="'Select age'"-->
+                             <!--[inputDropdownIsRequired]="true"-->
+                             <!--[inputDropdownDisabled]="disabled"-->
+                             <!--[dropdownItemDisabledFn]="dropdownDisabledFn()"-->
+                             <!--[inputPlaceholder]="'Select age...'"-->
+                             <!--[inputMin]="20"-->
+                             <!--[inputMax]="200"-->
+                             <!--[inputConflictNumbers]="[45,36]"-->
+                             <!--[dropdownMinWidth]="200"-->
+                             <!--(dropdownChangeItem)="setActiveItem($event)">-->
+  <!--</lib-input-dropdown-number>-->
   {{curAge}}
 </div>
 <button class="btn btn-primary" (click)="toggleDisabled()">

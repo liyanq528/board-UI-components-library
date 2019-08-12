@@ -93,7 +93,7 @@ export class InputExComponent implements OnInit, CheckSelfValid {
     if (value) {
       this.inputControl.disable();
     } else {
-      this.inputControl.enable();
+      this.inputControl.enable({emitEvent: false});
     }
   }
 
