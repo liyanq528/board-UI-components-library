@@ -89,16 +89,24 @@ export class DropdownExComponent implements OnInit, OnChanges, AfterViewInit, Ch
         }
       }
     });
-    if (this.dropdownDefaultActiveIndex > -1 && this.dropdownItems.length > 0) {
-      const item = this.dropdownItems[this.dropdownDefaultActiveIndex];
-      this.changeItemExecute(item);
-    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (Reflect.has(changes, 'dropdownItems')) {
       this.filteredDropdownItems = this.dropdownItems;
-      this.dropdownActiveItem = undefined;
+      const preValue = Reflect.get(changes, 'dropdownItems').previousValue as Array<any>;
+      const curValue = Reflect.get(changes, 'dropdownItems').currentValue as Array<any>;
+      if (preValue && curValue && preValue.length > 0 && curValue.length > 0) {
+        this.dropdownActiveItem = undefined;
+        this.dropdownDefaultActiveIndex = -1;
+      }
+    }
+    if (Reflect.has(changes, 'dropdownDefaultActiveIndex')) {
+      const curValue = Reflect.get(changes, 'dropdownDefaultActiveIndex').currentValue as number;
+      if (curValue > -1 && this.dropdownItems && this.dropdownItems.length > 0) {
+        const item = this.dropdownItems[curValue];
+        this.changeItemExecute(item);
+      }
     }
   }
 
