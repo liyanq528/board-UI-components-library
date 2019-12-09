@@ -40,7 +40,7 @@ export class InputExDemoComponent implements OnInit {
   checkAsyncControl(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
     return new Promise(resolve => {
       if (control.value === this.title) {
-        setTimeout(() => resolve({exists: 'exists'}), 2000);
+        setTimeout(() => resolve({exists: 'exists'}), 3000);
       } else {
         resolve(null);
       }

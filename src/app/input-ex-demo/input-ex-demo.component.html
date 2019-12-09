@@ -1,5 +1,5 @@
 <div style="margin-left: 20px;width: 500px;">
-  <lib-input-ex [inputLabel]="'testInputLabel'"
+  <lib-input-ex [inputLabel]="'testInputLabel testInputLabel testInputLabel'"
                 [inputDefaultValue]="title"
                 [inputIsRequired]="true"
                 [inputDisabled]="disabled"
@@ -76,3 +76,9 @@
 <button class="btn btn-primary" (click)="checkValue()">
   触发检查
 </button>
+<clr-tooltip>
+  <clr-icon clrTooltipTrigger shape="info-circle" size="24" aria-label="Uniq tooltip 2"></clr-icon>
+  <clr-tooltip-content clrPosition="top-right" clrSize="lg" *clrIfOpen>
+    <span>Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum</span>
+  </clr-tooltip-content>
+</clr-tooltip>

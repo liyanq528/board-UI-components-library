@@ -61,6 +61,7 @@ export class InputExComponent implements OnInit, CheckSelfValid {
   @Output() revertEvent: EventEmitter<any>;
   @Output() commitEvent: EventEmitter<any>;
   @Output() valueChanges: EventEmitter<any>;
+  @Output() statusChanges: EventEmitter<any>;
   @ViewChild('input') inputHtml: ElementRef;
   inputStatus: InputExStatus = InputExStatus.iesView;
   inputValidatorParam = '';
@@ -77,6 +78,7 @@ export class InputExComponent implements OnInit, CheckSelfValid {
     this.revertEvent = new EventEmitter();
     this.commitEvent = new EventEmitter();
     this.valueChanges = new EventEmitter();
+    this.statusChanges = new EventEmitter();
     this.validatorMessage = new Array<{ key: string, message: string }>();
     this.inputValidatorFns = new Array<ValidatorFn>();
     this.inputControl = this.fb.control({value: '', disabled: this.isDisabled});
@@ -173,6 +175,7 @@ export class InputExComponent implements OnInit, CheckSelfValid {
   installValidators() {
     this.valueSubscription = this.inputControl.valueChanges.subscribe((value: any) => this.valueChanges.next(value));
     this.statusSubscription = this.inputControl.statusChanges.subscribe((value: any) => {
+      this.statusChanges.emit(value);
       if (this.inputControl.valid) {
         this.revertValue = this.inputControl.value;
         const commitValue = this.inputCategory === InputExCategory.iecNumber ?

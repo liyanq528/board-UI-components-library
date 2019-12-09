@@ -1,9 +1,11 @@
 <div class="input-ex-container" [style.width]="inputWidth" [formGroup]="inputFormGroup">
+  <div *ngIf="inputControl.pending" class="pending-mask"></div>
   <label *ngIf="showLabel"
-         (mousedown)="onEditClick()"
-         (click)="onEditClick()"
          class="input-ex-label"
-         [style.minWidth.px]="inputLabelWidth">
+         [title]="inputLabel"
+         [style.minWidth.px]="inputLabelWidth"
+         (mousedown)="onEditClick()"
+         (click)="onEditClick()">
     {{inputLabel}}:
   </label>
   <span *ngIf="inputIsRequired" class="asterisk">*</span>
@@ -35,7 +37,7 @@
      (click)="onEditClick()">
     <clr-icon shape="note"></clr-icon>
   </a>
-  <a *ngIf="inputStatus == 1 && inputControl.enabled"
+  <a *ngIf="inputStatus == 1 && inputControl.enabled && !inputControl.pending"
      href="javascript:void(0)"
      class="input-ex-icon"
      (click)="onCommitClick($event)">

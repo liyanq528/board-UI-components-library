@@ -23,7 +23,7 @@
     "@clr/icons": "^1.1.5",
     "@clr/ui": "^1.1.5",
     "@webcomponents/custom-elements": "^1.2.4",
-    "board-components-library": "^1.0.76",
+    "board-components-library": "^1.0.82",
     "core-js": "^2.5.4",
     "rxjs": "~6.3.3",
     "save": "^2.4.0",
