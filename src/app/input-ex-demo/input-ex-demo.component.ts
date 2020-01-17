@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { InputExComponent } from 'board-components-library';
+import { InputExComponent } from '../../../projects/board-components-library/src/lib/input-ex/input-ex.component';
 
 @Component({
   selector: 'app-input-ex-demo',

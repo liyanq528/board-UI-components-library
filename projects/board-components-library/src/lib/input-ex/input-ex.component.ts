@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Inject, Input, OnInit, Optional, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -57,7 +57,9 @@ export class InputExComponent implements OnInit, CheckSelfValid {
   @Input() validatorAsyncFn: AsyncValidatorFn;
   @Input() validatorMessage: Array<{ key: string, message: string }>;
   @Input() inputUpdateOn: 'change' | 'blur' | 'submit' = 'blur';
+  @Input() toolTipPosition = 'bottom-left';
   @Output() editEvent: EventEmitter<any>;
+  @Output() inputEvent: EventEmitter<any>;
   @Output() revertEvent: EventEmitter<any>;
   @Output() commitEvent: EventEmitter<any>;
   @Output() valueChanges: EventEmitter<any>;
@@ -78,6 +80,7 @@ export class InputExComponent implements OnInit, CheckSelfValid {
     this.revertEvent = new EventEmitter();
     this.commitEvent = new EventEmitter();
     this.valueChanges = new EventEmitter();
+    this.inputEvent = new EventEmitter();
     this.statusChanges = new EventEmitter();
     this.validatorMessage = new Array<{ key: string, message: string }>();
     this.inputValidatorFns = new Array<ValidatorFn>();
@@ -105,7 +108,9 @@ export class InputExComponent implements OnInit, CheckSelfValid {
 
   @Input() set inputDefaultValue(value: string | number) {
     this.revertValue = value;
+    this.unInstallValidators();
     this.inputControl.setValue(value);
+    this.installValidators();
     this.inputStatus = InputExStatus.iesView;
   }
 
@@ -261,6 +266,12 @@ export class InputExComponent implements OnInit, CheckSelfValid {
         this.editEvent.emit(this.inputControl.value);
       }
     }
+  }
+
+  onInput(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    const commitValue = this.inputCategory === InputExCategory.iecNumber ? inputElement.valueAsNumber : inputElement.value;
+    this.inputEvent.emit(commitValue);
   }
 
   public onInputBlur() {

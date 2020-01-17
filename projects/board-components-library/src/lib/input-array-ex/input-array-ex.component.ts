@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { CheckSelfValid, InputArrayExCategory, InputArrayExType } from '../shared.types';
-import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { InputExComponent } from '../input-ex/input-ex.component';
 
@@ -31,21 +31,29 @@ export class InputArrayExComponent implements OnInit, CheckSelfValid {
   @Input() inputArrayPattern: RegExp;
   @Input() inputArrayDefault: Array<InputArrayExType>;
   @Input() inputArrayFixed: Array<InputArrayExType>;
+  @Input() validatorFns: Array<ValidatorFn>;
+  @Input() validatorMessage: Array<{ key: string, message: string }>;
   @ViewChild(InputExComponent) inputExComponent: InputExComponent;
   @Output() commitEvent: EventEmitter<Array<InputArrayExType>>;
   checkSelfAnimation: string;
   source: Array<InputArrayExType>;
   currentObjectValue: object;
+  inputValidatorFns: Array<ValidatorFn>;
 
   constructor() {
     this.commitEvent = new EventEmitter();
     this.source = new Array<InputArrayExType>();
+    this.inputValidatorFns = new Array<ValidatorFn>();
   }
 
   ngOnInit() {
     if (this.inputArrayDefault) {
       this.source.unshift(...this.inputArrayDefault);
     }
+    if (this.validatorFns) {
+      this.inputValidatorFns = this.inputValidatorFns.concat(this.validatorFns);
+    }
+    this.inputValidatorFns.push(this.validatorExists.bind(this));
   }
 
   get category(): number {
@@ -58,10 +66,6 @@ export class InputArrayExComponent implements OnInit, CheckSelfValid {
 
   isFixedItem(item: InputArrayExType): boolean {
     return this.inputArrayFixed ? this.inputArrayFixed.indexOf(item) > -1 : false;
-  }
-
-  validatorExistsFn() {
-    return this.validatorExists.bind(this);
   }
 
   validatorExists(control: AbstractControl): ValidationErrors | null {

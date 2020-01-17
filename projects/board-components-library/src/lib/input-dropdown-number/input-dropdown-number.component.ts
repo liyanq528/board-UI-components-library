@@ -1,8 +1,17 @@
-import { AfterViewInit, Component, ContentChild, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ContentChild,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { CheckSelfValid, DropdownExDisabledFn } from '../shared.types';
 import { ItemTempDirective } from '../directives/item-temp.directive';
-import { IfOpenService } from '@clr/angular/utils/conditional/if-open.service';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { InputExComponent } from '../input-ex/input-ex.component';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { BoardComponentsLibraryService } from '../board-components-library.service';
@@ -10,18 +19,11 @@ import { BoardComponentsLibraryService } from '../board-components-library.servi
 @Component({
   selector: 'lib-input-dropdown-number',
   templateUrl: './input-dropdown-number.component.html',
-  styleUrls: ['./input-dropdown-number.component.css'],
-  animations: [
-    trigger('check', [
-      state('begin', style({backgroundColor: '#d28f00'})),
-      state('end', style({backgroundColor: 'transparent'})),
-      transition('begin => end', animate(500))
-    ])
-  ]
+  styleUrls: ['./input-dropdown-number.component.css']
 })
-export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, AfterViewInit {
+export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, AfterViewInit, OnDestroy {
   @ViewChild(InputExComponent) inputComponent: InputExComponent;
-  @ViewChild('dropdownEx') dropdownEx: object;
+  @ViewChild('inputDropdownContainer') inputDropdownContainer: ElementRef;
   @Input() placeholder = '';
   @Input() isRequired = false;
   @Input() max = 0;
@@ -32,17 +34,17 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
   @Input() validatorMessage: Array<{ key: string, message: string }>;
   @Input() menuHeader = '';
   @Input() tip = '';
-  @Input() dropdownMinWidth = 180;
+  @Input() inputWidth = '100%'; // old -> dropdownMinWidth
   @Input() labelWidth = 180;
-  @Input() defaultActiveIndex = -1;
-  @Input() activeItem: number;
+  @Input() defaultValue: number; // old -> activeItem
   @Input() disabledFn: DropdownExDisabledFn;
   @Output() changeItem: EventEmitter<number>;
   @ContentChild(ItemTempDirective) itemTemp: ItemTempDirective;
-
-  checkSelfAnimation: string;
+  showDropdownList = false;
+  showDropdownListFromEdit = false;
+  inputContent: number;
   dropdownItems: Array<number>;
-  curValue = '';
+  itemsContainerWidth = 0;
 
   constructor(private service: BoardComponentsLibraryService) {
     this.changeItem = new EventEmitter<number>();
@@ -52,33 +54,21 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
   }
 
   ngOnInit() {
-    if (this.activeItem) {
-      this.prepareDropdownList(`${this.activeItem}`);
-    } else {
-      this.prepareDropdownList('');
-    }
+    this.prepareDropdownList();
+    document.addEventListener('click', this.listenerClick.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('click', this.listenerClick.bind(this));
   }
 
   ngAfterViewInit(): void {
-    if (this.activeItem) {
-      this.changeItemSelect(this.activeItem);
-    }
-  }
-
-  get notSelect(): boolean {
-    return this.activeItem === undefined;
+    const container = this.inputDropdownContainer.nativeElement as HTMLDivElement;
+    this.itemsContainerWidth = container.offsetWidth - this.labelWidth - 30;
   }
 
   get selected(): boolean {
-    return this.activeItem !== undefined;
-  }
-
-  get activeText(): string {
-    return this.selected ? this.activeItem.toString() : this.tip;
-  }
-
-  get isReadied(): boolean {
-    return !this.disabled;
+    return this.defaultValue !== undefined;
   }
 
   get isCustomTemplate(): boolean {
@@ -93,8 +83,8 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
     return this.dropdownItems !== undefined && this.dropdownItems.length === 0;
   }
 
-  get inputWidth(): string {
-    return `${this.dropdownMinWidth}px`;
+  get isValidInputContent(): boolean {
+    return this.inputContent !== undefined && !Number.isNaN(this.inputContent);
   }
 
   get validInputFunBind() {
@@ -108,31 +98,17 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
       {inUsed: defaultMessage} : null;
   }
 
-  prepareDropdownList(value: string) {
-    this.dropdownItems.splice(0, this.dropdownItems.length);
-    for (let i = 0; i < 8; i++) {
-      const startMin = this.dropdownItems.length > 0 ? this.dropdownItems[this.dropdownItems.length - 1] : this.min;
-      const validValue = this.getNextMinValidNumber(startMin, value);
-      if (validValue > 0) {
-        this.dropdownItems.push(validValue);
-      }
+  listenerClick(event: Event) {
+    event.stopPropagation();
+    if (!this.showDropdownListFromEdit) {
+      this.showDropdownList = false;
+    } else {
+      this.showDropdownListFromEdit = false;
     }
   }
 
-  validNumberStart(validNumber: number): string {
-    const validNumberStr = `${validNumber}`;
-    const index = validNumberStr.indexOf(this.curValue);
-    return validNumberStr.slice(0, index);
-  }
-
-  validNumberEnd(validNumber: number): string {
-    const validNumberStr = `${validNumber}`;
-    const index = validNumberStr.indexOf(this.curValue) + this.curValue.length;
-    return validNumberStr.slice(index);
-  }
-
   itemActive(item: number): boolean {
-    return item === this.activeItem;
+    return item === this.defaultValue;
   }
 
   itemDisabled(item: number): boolean {
@@ -143,51 +119,96 @@ export class InputDropdownNumberComponent implements OnInit, CheckSelfValid, Aft
     }
   }
 
-  getNextMinValidNumber(baseNumber: number, subStr: string): number {
+  changeItemSelect(item: number, event: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (this.inUsedNumbers.indexOf(item) === -1) {
+      if (this.disabledFn) {
+        if (!this.disabledFn(item)) {
+          this.defaultValue = item;
+          this.inputContent = item;
+          this.changeItem.emit(item);
+        }
+      } else {
+        this.defaultValue = item;
+        this.inputContent = item;
+        this.changeItem.emit(item);
+      }
+      this.showDropdownListFromEdit = false;
+      this.showDropdownList = false;
+    }
+  }
+
+  validNumberStart(validNumber: number): string {
+    const validNumberStr = `${validNumber}`;
+    const index = validNumberStr.indexOf(`${this.inputContent}`);
+    const from = (this.isValidInputContent && index > -1) ? 0 : -1;
+    const len = (this.isValidInputContent && index > -1) ? index : -1;
+    return validNumberStr.substr(from, len);
+  }
+
+  validNumberMiddle(validNumber: number): string {
+    const validNumberStr = `${validNumber}`;
+    const index = validNumberStr.indexOf(`${this.inputContent}`);
+    const from = (this.isValidInputContent && index > -1) ? validNumberStr.indexOf(`${this.inputContent}`) : -1;
+    const len = (this.isValidInputContent && index > -1) ? `${this.inputContent}`.length : -1;
+    return validNumberStr.substr(from, len);
+  }
+
+  validNumberEnd(validNumber: number): string {
+    const validNumberStr = `${validNumber}`;
+    const index = validNumberStr.indexOf(`${this.inputContent}`);
+    const from = (this.isValidInputContent && index > -1) ? index + `${this.inputContent}`.length : 0;
+    return validNumberStr.substr(from);
+  }
+
+  isInUsed(validNumber: number): boolean {
+    return this.inUsedNumbers.indexOf(validNumber) > -1;
+  }
+
+  prepareDropdownList() {
+    this.dropdownItems.splice(0, this.dropdownItems.length);
+    const startNumber = (this.isValidInputContent && (this.inputContent > this.min) && (this.inputContent < this.max)) ?
+      this.inputContent - 1 : this.min - 1;
+    for (let i = 0; i < 6; i++) {
+      const startMin = this.dropdownItems.length > 0 ? this.dropdownItems[this.dropdownItems.length - 1] : startNumber;
+      const validValue = this.getNextMinValidNumber(startMin);
+      if (validValue > 0) {
+        this.dropdownItems.push(validValue);
+      }
+    }
+  }
+
+  getNextMinValidNumber(baseNumber: number): number {
     const result = baseNumber + 1;
     if (result < this.min || result > this.max) {
       return 0;
     }
-    const strResult = `${result}`;
-    if (strResult.indexOf(subStr) === -1) {
-      return this.getNextMinValidNumber(baseNumber + 1, subStr);
-    }
     return result;
   }
 
-  changeItemSelect(item: number) {
-    if (this.disabledFn) {
-      if (!this.disabledFn(item)) {
-        this.activeItem = item;
-        this.curValue = `${item}`;
-        this.changeItem.emit(item);
-      }
-    } else {
-      this.activeItem = item;
-      this.curValue = `${item}`;
-      this.changeItem.emit(item);
-    }
-  }
-
-  commitValue(value: number) {
+  commitEvent(value: number) {
     if (value >= this.min && value <= this.max && !this.itemDisabled(value) &&
       (this.inUsedNumbers ? this.inUsedNumbers.findIndex(value1 => value1 === value) === -1 : true)) {
-      this.changeItemSelect(value);
+      this.changeItemSelect(value, null);
     }
   }
 
-  valueChanges(value: number) {
-    this.curValue = `${value}`;
-    if (this.dropdownEx && Reflect.has(this.dropdownEx, 'ifOpenService')) {
-      const openService = Reflect.get(this.dropdownEx, 'ifOpenService') as IfOpenService;
-      openService.open = true;
-    }
-    this.prepareDropdownList(this.curValue);
+  inputChanges(value: number) {
+    this.showDropdownList = true;
+    this.showDropdownListFromEdit = false;
+    this.inputContent = value;
+    this.prepareDropdownList();
+  }
+
+  editEvent() {
+    this.showDropdownList = true;
+    this.showDropdownListFromEdit = true;
   }
 
   public checkSelf() {
-    this.checkSelfAnimation = 'begin';
-    setTimeout(() => this.checkSelfAnimation = 'end', 2000);
+    this.inputComponent.checkSelf();
   }
 
   public get isValid(): boolean {

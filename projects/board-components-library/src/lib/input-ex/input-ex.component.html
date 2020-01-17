@@ -11,10 +11,13 @@
   <span *ngIf="inputIsRequired" class="asterisk">*</span>
   <label aria-haspopup="true"
          role="tooltip"
-         class="input-ex-field-container tooltip tooltip-md"
+         class="input-ex-field-container tooltip"
          (mousedown)="onEditClick()"
          [class.tooltip-validation]="inputControl.enabled"
-         [class.tooltip-bottom-left]="inputControl.enabled"
+         [class.tooltip-bottom-left]="toolTipPosition === 'bottom-left'"
+         [class.tooltip-bottom-right]="toolTipPosition === 'bottom-right'"
+         [class.tooltip-top-left]="toolTipPosition === 'top-left'"
+         [class.tooltip-top-right]="toolTipPosition === 'top-right'"
          [class.invalid]="inputControl.invalid && inputControl.touched">
     <input #input
            formControlName="inputControl"
@@ -23,10 +26,11 @@
            [class.click-model]="inputControl.enabled && inputType == 2"
            [class.source-password]="sourcePassword"
            [class.verify-password]="verifyPassword"
+           [title]="inputControl.value"
+           [placeholder]="inputPlaceholder"
+           (input)="onInput($event)"
            (blur)="onInputBlur()"
-           (focus)="onInputFocus()"
-           [title]="inputPlaceholder"
-           [placeholder]="inputPlaceholder">
+           (focus)="onInputFocus()">
     <span *ngIf="inputControl.errors" class="tooltip-content">
       {{getValidatorMessage(inputControl.errors)}}{{inputValidatorParam}}
     </span>

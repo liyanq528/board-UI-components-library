@@ -1,5 +1,6 @@
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { InputDropdownNumberComponent } from 'board-components-library';
+import { InputDropdownNumberComponent } from
+    '../../../projects/board-components-library/src/lib/input-dropdown-number/input-dropdown-number.component';
 
 @Component({
   selector: 'app-input-dropdown-ex-demo',
@@ -25,7 +26,7 @@ export class InputDropdownExDemoComponent implements OnInit {
     return age === 123;
   }
 
-  setActiveItem(age: number ) {
+  setActiveItem(age: number) {
     this.curAge = age;
   }
 

@@ -115,7 +115,7 @@ export class DropdownExComponent implements OnInit, OnChanges, AfterViewInit, Ch
   }
 
   get dropdownShowSearch(): boolean {
-    return this.isReadied && this.dropdownItems.length > DROPDOWN_EX_DEFAULT_SHOW_COUNT;
+    return this.active && this.isReadied && this.dropdownItems.length > DROPDOWN_EX_DEFAULT_SHOW_COUNT;
   }
 
   get isEspecialTemplate(): boolean {
@@ -196,7 +196,7 @@ export class DropdownExComponent implements OnInit, OnChanges, AfterViewInit, Ch
     return this.filteredDropdownItems.indexOf(item) < 0;
   }
 
-  filterExecute($event: KeyboardEvent) {
+  filterExecute($event: Event) {
     this.filterText = ($event.target as HTMLInputElement).value;
     this.filterSubject.next(this.filterText);
   }

@@ -10,7 +10,8 @@
                 [inputMin]="inputMin"
                 [inputPlaceholder]="inputPlaceholder"
                 [inputResetObject]="currentObjectValue"
-                [validatorFns]="[validatorExistsFn()]"
+                [validatorFns]="inputValidatorFns"
+                [validatorMessage]="validatorMessage"
                 [inputDisabled]="inputDisabled"
                 (commitEvent)="commitValue($event)">
   </lib-input-ex>

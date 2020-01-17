@@ -1,5 +1,5 @@
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { InputArrayExComponent } from 'board-components-library';
+import { InputArrayExComponent } from '../../../projects/board-components-library/src/lib/input-array-ex/input-array-ex.component';
 
 @Component({
   selector: 'app-input-array-ex-demo',

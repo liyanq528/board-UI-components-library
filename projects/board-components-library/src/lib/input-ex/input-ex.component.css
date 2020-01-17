@@ -80,10 +80,6 @@ input::-ms-input-placeholder {
   font-size: 14px;
 }
 
-span.tooltip-content {
-  min-width: 200px;
-}
-
 a.input-ex-icon {
   margin-left: 5px;
   flex-basis: 20px;
